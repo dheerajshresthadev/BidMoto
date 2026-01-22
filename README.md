@@ -265,6 +265,18 @@ This is an initial service implementation. When contributing:
 - **Ocelot/YARP** - API Gateway
 - **Identity Server** - Authentication
 
+## 📋 Project Management
+
+### MVP Timeline
+**Target Completion:** End of March 2025 (2 months)
+
+### Key Milestones
+1. **Foundation** (Early February) - Project setup and infrastructure
+2. **Core Services** (Mid February) - Identity, Gateway, Auction, Bid services
+3. **Frontend & Integration** (Early March) - Next.js client and service integration
+4. **Testing & Polish** (Mid March) - Testing, monitoring, documentation
+5. **MVP Launch** (End of March) - Final testing and deployment
+
 ## 📄 License
 
 (To be determined)
@@ -276,3 +288,8 @@ This project is part of a larger microservices learning and development initiati
 ---
 
 **Note**: This README will be updated as new services are implemented and the architecture evolves. For detailed specifications of each service, refer to the specification documents in the project repository.
+
+**Quick Links:**
+- [Development Guide](DEVELOPMENT.md) - CLI commands and workflows
+- [GitHub Issues](GITHUB_ISSUES.md) - Complete issue list for MVP
+- [GitHub Setup](GITHUB_SETUP.md) - Project management setup guide
