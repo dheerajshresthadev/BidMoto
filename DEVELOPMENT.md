@@ -38,6 +38,12 @@ dotnet sln add src/AuctionService
 
 # Create .gitignore file
 dotnet new gitignore
+
+# Adds new class library
+dotnet new classlib -o src/Contracts
+
+# Adds reference to a class lib
+dotnet add reference ../../src/Contracts 
 ```
 
 ---
