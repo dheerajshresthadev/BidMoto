@@ -81,6 +81,8 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         auction.Item.Color = auctionDto.Color ?? auction.Item.Color;
         auction.Item.Mileage = auctionDto.Mileage;
 
+        await publishEndpoint.Publish(mapper.Map<AuctionUpdated>(auction));
+
         var result = await context.SaveChangesAsync() > 0;
 
         if (!result)
@@ -101,6 +103,8 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         }
 
         context.Auctions.Remove(auction);
+
+        await publishEndpoint.Publish<AuctionDeleted>(new {Id = auction.Id.ToString()});
 
         var result = await context.SaveChangesAsync() > 0;
 
