@@ -5,6 +5,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Contracts;
 using MassTransit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,12 +44,13 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         return mapper.Map<AuctionDto>(auction);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<AuctionDto>> CreateAuction([FromBody] CreateAuctionDto auctionDto)
     {
         var auction = mapper.Map<Auction>(auctionDto);
 
-        auction.Seller = "test-seller";
+        auction.Seller = User.Identity?.Name ?? "anonymous";
 
         context.Auctions.Add(auction);
 
@@ -63,6 +65,7 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         return CreatedAtAction(nameof(GetAuction), new { id = auction.Id }, newAuction);
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<ActionResult<AuctionDto>> UpdateAuction(Guid id, [FromBody] UpdateAuctionDto auctionDto)
     {
@@ -73,6 +76,11 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         if (auction == null)
         {
             return NotFound();
+        }
+
+        if (auction.Seller != User.Identity?.Name)
+        {
+            return Forbid("You are not authorized to update this auction");
         }
 
         auction.Item.Make = auctionDto.Make ?? auction.Item.Make;
@@ -93,6 +101,7 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         return Ok();
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteAuction(Guid id)
     {
@@ -100,6 +109,11 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
         if (auction == null)
         {
             return NotFound();
+        }
+
+        if (auction.Seller != User.Identity?.Name)
+        {
+            return Forbid("You are not authorized to delete this auction");
         }
 
         context.Auctions.Remove(auction);
