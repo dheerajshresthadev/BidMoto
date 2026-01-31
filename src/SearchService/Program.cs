@@ -26,6 +26,10 @@ builder.Services.AddMassTransit(x=>
     });
 });
 
+builder.Services.AddHostedService<EventAuctionJob>();
+
+
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();

@@ -3,6 +3,7 @@ using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Confluent.Kafka;
 using Contracts;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
@@ -56,9 +57,28 @@ public class AuctionsController(AuctionDbContext context, IMapper mapper, IPubli
 
         var result = await context.SaveChangesAsync() > 0;
 
-        await publishEndpoint.Publish(mapper.Map<AuctionCreated>(newAuction));
+        var auctionCreated = mapper.Map<AuctionCreated>(newAuction);
+
+        //await publishEndpoint.Publish(auctionCreated);
 
         if (!result) return BadRequest("Failed to create auction");
+
+        var config = new ProducerConfig
+        {
+            BootstrapServers = "localhost:9092",
+            AllowAutoCreateTopics = true,
+            Acks = Acks.All
+        };
+
+        using var producer = new ProducerBuilder<Null, string>(config).Build();
+
+        var deliveryResult = await producer.ProduceAsync("auction-created-topic",
+            new Message<Null, string> 
+            { 
+                Value = System.Text.Json.JsonSerializer.Serialize(auctionCreated) 
+            });
+
+        producer.Flush();
 
         return CreatedAtAction(nameof(GetAuction), new { id = auction.Id }, newAuction);
     }
