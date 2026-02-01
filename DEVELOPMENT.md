@@ -45,9 +45,14 @@ dotnet new classlib -o src/Contracts
 # Adds reference to a class lib
 dotnet add reference ../../src/Contracts 
 
-#Add Identity Server
+# Add Identity Server
 dotnet new install Duende.Templates
 dotnet new duende-is-aspid -o src/IdentityService
+
+# Add Gateway service
+
+dotnet new web -o src/GatewayService
+
 ```
 
 ---
