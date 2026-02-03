@@ -470,3 +470,6 @@ dotnet clean --verbosity detailed
 ---
 
 **Note**: Replace `src/AuctionService` with the actual path to your project when using these commands. Adjust project names and paths according to your project structure.
+
+
+npx create-next-app@latest 
