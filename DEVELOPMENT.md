@@ -462,6 +462,10 @@ dotnet build --no-incremental
 # Clear bin and obj folders
 dotnet clean --verbosity detailed
 ```
+ docker build -f src/AuctionService/Dockerfile -t testing123 .
+ docker run testing123
+ docker compose build auction-svc
+ docker compose up -d
 
 ---
 
