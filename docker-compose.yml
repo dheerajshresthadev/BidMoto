@@ -40,6 +40,77 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+  auction-svc:
+    image: 9803175625/auction-svc:latest
+    build: 
+      context: .
+      dockerfile: src/AuctionService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_URLS=http://+:7777
+      - RabbitMQ__Host=rabbitmq
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=postgres;Password=postgrespw;Database=auctions
+      - IdentityServiceUrl=http://identity-svc
+      # - Kestrel__Endpoints__Grpc__Protocols=Http2
+      # - Kestrel__Endpoints__Grpc__Url=http://+:7777
+      # - Kestrel__Endpoints__WebApi__Protocols=Http1
+      # - Kestrel__Endpoints__WebApi__Url=http://+80
+    ports:
+      - 7001:80
+      - 7777:7777
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+  search-svc:
+    image: 9803175625/search-svc:latest
+    build: 
+      context: .
+      dockerfile: src/SearchService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - RabbitMQ__Host=rabbitmq
+      - ConnectionStrings__MongoDbConnection=mongodb://root:mongopw@mongodb
+      - AuctionServiceUrl=http://auction-svc
+    ports:
+      - 7002:80
+    depends_on:
+      rabbitmq:
+        condition: service_started
+      mongodb:
+        condition: service_healthy
+  identity-svc:
+    image: 9803175625/identity-svc:latest
+    build: 
+      context: .
+      dockerfile: src/IdentityService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      # - IssuerUri=https://id.carsties.local
+      # - ClientApp=https://app.carsties.local
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Username=postgres;Password=postgrespw;Database=identity
+      # - VIRTUAL_HOST=id.carsties.local
+    ports:
+      - 5001:80
+    depends_on:
+      postgres:
+        condition: service_healthy
+  gateway-svc:
+    image: 9803175625/gateway-svc:latest
+    build: 
+      context: .
+      dockerfile: src/GatewayService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      - ClientApp=https://app.bidmoto.local
+      - VIRTUAL_HOST=api.bidmoto.local
+    ports:
+      - 6001:80
 volumes:
   pgdata:
   mongodata:
